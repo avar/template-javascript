@@ -39,6 +39,22 @@ Template::JavaScript - A templating engine using the L<JavaScript::V8> module
       this is a loop
     after
 
+=head1 DESCRIPTION
+
+This is a very simple template to JavaScript compiler. We compile
+either templates passed in as strings or as a file with L<Template
+Toolkit|Template>, so you can do includes etc. like L<Template>
+normally does it.
+
+Once L<Template> has run we apply our own syntax, which is that any
+line beginning with C<%> is JavaScript and any other line is output
+verbatim.
+
+After the compilation phase (which you can cache) we execute the
+template with L<JavaScript::V8>. So your templates will run very fast
+in the V8 JIT. We provide ways to pass variables and functions back &
+forth to L<JavaScript::V8> through its normal facilities.
+
 =cut
 
 has bind => (
