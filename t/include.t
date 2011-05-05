@@ -10,13 +10,12 @@ use Template;
 ok(1);
 
 my $data_dir = catdir($Bin, 'swamp');
-
-my $tt = Template->new({
-    INCLUDE_PATH => $data_dir,       # or list ref
-    INTERPOLATE  => 0,               # expand "$var" in plain text
-    POST_CHOMP   => 0,               # cleanup whitespace 
-    EVAL_PERL    => 0,               # evaluate Perl code blocks
-    ABSOLUTE     => 1,
-});
 my $root = catfile($data_dir, 'root.tt');
-$tt->process($root) || die $tt->error;
+
+my $ctx = Template::JavaScript->new(
+    include_path => $data_dir,
+);
+$ctx->output( \my $out );
+$ctx->tmpl_file( $root );
+$ctx->run;
+

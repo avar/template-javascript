@@ -9,6 +9,10 @@ use Any::Moose;
 
 use JavaScript::V8;
 
+use File::Spec::Functions qw(catdir catfile);
+use File::Slurp qw(slurp);
+use Template;
+
 =head1 NAME
 
 Template::JavaScript - A templating engine using the L<JavaScript::V8> module
@@ -48,6 +52,33 @@ has template => (
     isa           => 'Str',
     documentation => 'Things to bind',
 );
+
+has _tt => (
+    is            => 'rw',
+    isa           => 'Template',
+    lazy_build    => 1,
+    documentation => 'Our Template Toolkit object',
+);
+
+has include_path => (
+    is            => 'rw',
+    isa           => 'Str|ArrayRef',
+    documentation => 'The include path for the templates',
+);
+
+sub _build__tt {
+    my ($self) = @_;
+
+    my $tt = Template->new({
+        INCLUDE_PATH => $self->include_path, # or list ref
+        INTERPOLATE  => 0,         # expand "$var" in plain text
+        POST_CHOMP   => 0,         # cleanup whitespace 
+        EVAL_PERL    => 0,         # evaluate Perl code blocks
+        ABSOLUTE     => 1,         # all includes are absolute
+    });
+
+    return $tt;
+}
 
 has say => (
     is            => 'ro',
@@ -107,6 +138,15 @@ sub tmpl_fh {
     }
 
     $self->template( $code );
+}
+
+sub tmpl_file {
+    my ($self, $file) = @_;
+
+    my $output;
+    $self->_tt->process($file, {}, \$output) || die $self->_tt->error;
+
+    $self->template( $file );
 }
 
 sub run {
