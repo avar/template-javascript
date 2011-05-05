@@ -39,9 +39,18 @@ has template => (
     documentation => 'Things to bind',
 );
 
+has say => (
+    is            => 'ro',
+    isa           => 'Any',
+    default       => sub { say @_ },
+    documentation => 'Your callback for say, instead of ours',
+);
+
 sub BUILD {
     my ($self) = @_;
     my $context = $self->_context;
+
+    # Maybe the user wants to override say
 
     # Standard library
     $context->bind_function(

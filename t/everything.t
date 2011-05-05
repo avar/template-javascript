@@ -24,6 +24,7 @@ header
 <footeR>
 TEMPLATE
 
+my $output;
 my $t = Template::JavaScript->new(
     bind => [
         [
@@ -35,6 +36,7 @@ my $t = Template::JavaScript->new(
         ],
     ],
     template => $template,
+    say => sub { $output .= shift },
 );
 
 $t->run;
