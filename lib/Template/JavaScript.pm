@@ -11,43 +11,46 @@ Template::JavaScript - A templating engine using the L<JavaScript::V8> module
 
 =cut
 
-my $context = JavaScript::V8::Context->new;
+sub run {
 
-$context->bind_function( say => sub {
-  say @_;
-} );
+    my $context = JavaScript::V8::Context->new;
 
-$context->bind_function( include => sub {
-  say "# including <$_[0]>...";
-} );
+    $context->bind_function( say => sub {
+                                 say @_;
+                             } );
 
-$context->bind( b => {
-    site_name => 'boob',
-} );
+    $context->bind_function( include => sub {
+                                 say "# including <$_[0]>...";
+                             } );
 
-$context->bind( iloveyou => {
-    banana => 1,
-    rama => 2,
-    cazzi_mazzi => 0,
-} );
+    $context->bind( b => {
+        site_name => 'boob',
+    } );
 
-my $code = '';
+    $context->bind( iloveyou => {
+        banana => 1,
+        rama => 2,
+        cazzi_mazzi => 0,
+    } );
 
-while (my $line = <DATA>) {
-  chomp $line;
-  if ( substr($line, 0, 1) ne '%' ){
-    $code .= q[;say('] . $line . q[');];
-} else {
-    substr($line, 0, 1, '');
+    my $code = '';
 
-    $code .= $line;
-}
-}
+    while (my $line = <DATA>) {
+        chomp $line;
+        if ( substr($line, 0, 1) ne '%' ) {
+            $code .= q[;say('] . $line . q[');];
+        } else {
+            substr($line, 0, 1, '');
 
-say "code:[$code]";
+            $code .= $line;
+        }
+    }
 
-unless ( my $retval = $context->eval($code) ){
-  say "retval:[$retval] \$\@:[$@]";
+    say "code:[$code]";
+
+    unless ( my $retval = $context->eval($code) ){
+        say "retval:[$retval] \$\@:[$@]";
+    }
 }
 
 1;
