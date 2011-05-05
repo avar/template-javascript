@@ -28,6 +28,7 @@ $ctx4->tmpl_string( <<'DICKS' );
 % var other_value = 'NO';
 This is the value: <% my_value %> and I want it <% other_value %>
 
+
 DICKS
 
 $ctx4->output( \$text );
@@ -35,6 +36,7 @@ $ctx4->run;
 
 is( $text, <<'DICKS', 'can interpolate variables inline with correct newline handling' );
 This is the value: YES and I want it NO
+
 
 DICKS
 
