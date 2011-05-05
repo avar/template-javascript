@@ -168,6 +168,7 @@ sub run {
                         die;
                     }
                 } @parts;
+                $js_code .= qq[;whisper("\\n");];
             }
         } else {
             substr($line, 0, 1, '');
