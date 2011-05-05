@@ -80,13 +80,6 @@ sub _build__tt {
     return $tt;
 }
 
-has say => (
-    is            => 'ro',
-    isa           => 'Any',
-    default       => sub { sub { say @_ } },
-    documentation => 'Your callback for say, instead of ours',
-);
-
 has output => (
     is            => 'rw',
     isa           => 'Any',
@@ -96,21 +89,11 @@ sub BUILD {
     my ($self) = @_;
     my $context = $self->_context;
 
-    # Maybe the user wants to override say
-
     # Standard library
-    $context->bind_function( say => $self->say );
-
-    $context->bind_function( javascript_output => sub {
+    $context->bind_function( say => sub {
         $self->{_result} .= $_[0];
         $self->{_result} .= "\n";
     });
-
-    $context->bind_function(
-        include => sub {
-            say "# including <$_[0]>...";
-        }
-    );
 
     # User-supplied stuff
     my $bind = $self->bind;
@@ -158,7 +141,7 @@ sub run {
     for my $line (split /\n/, $self->template) {
         chomp $line;
         if ( substr($line, 0, 1) ne '%' ) {
-            $js_code .= qq[;javascript_output('$line');\n];
+            $js_code .= qq[;say('$line');\n];
         } else {
             substr($line, 0, 1, '');
 

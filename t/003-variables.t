@@ -44,11 +44,12 @@ $ctx->tmpl_string( $three_loops );
 
 $ctx->run;
 
-is( $out, <<'OUTPUT', 'can do variable includes' );
+is_deeply( $out, <<'OUTPUT', 'can do variable includes' );
 header
 
   <h1>banana active</h1>
 
+nothing here
 
 
 <footeR>
