@@ -9,6 +9,7 @@ use Any::Moose;
 
 use JavaScript::V8;
 
+
 =head1 NAME
 
 Template::JavaScript - A templating engine using the L<JavaScript::V8> module
@@ -66,9 +67,7 @@ sub BUILD {
     # Maybe the user wants to override say
 
     # Standard library
-    $context->bind_function(
-        say => sub { say @_ },
-    );
+    $context->bind_function( say => $self->say );
 
     $context->bind_function(
         include => sub {
@@ -103,10 +102,10 @@ sub run {
         }
     }
 
-    # say "code:[$code]";
+ #   say "code:[$code]";
 
     unless ( my $retval = $context->eval($code) ){
-        # say "retval:[$retval] \$\@:[$@]";
+#        say "retval:[$retval] \$\@:[$@]";
     }
 }
 

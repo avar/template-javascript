@@ -1,3 +1,4 @@
+use v5.10.0;
 use Any::Moose;
 use Template::JavaScript;
 use Test::More qw(no_plan);
@@ -24,7 +25,7 @@ header
 <footeR>
 TEMPLATE
 
-my $output;
+$main::output = '';
 my $t = Template::JavaScript->new(
     bind => [
         [
@@ -36,8 +37,14 @@ my $t = Template::JavaScript->new(
         ],
     ],
     template => $template,
-    say => sub { $output .= shift },
+    say => sub {
+        use Data::Dumper;
+        print Dumper \@_;
+        $main::output .= $_[0];
+        say @_;
+    },
 );
+print "output: $output";
 
 $t->run;
 
