@@ -1,8 +1,12 @@
-#!/usr/bin/env perl
 package Template::JavaScript;
-use v5.10.0;
+# vim: ft=perl ts=4 sw=4 et:
 
+use strict;
+use warnings;
+
+use v5.010.1;
 use Any::Moose;
+
 use JavaScript::V8;
 
 =head1 NAME
@@ -14,6 +18,16 @@ Template::JavaScript - A templating engine using the L<JavaScript::V8> module
 =head1 ATTRIBUTES
 
 =cut
+
+sub output_ref {
+    my ($self) = @_;
+}
+
+sub parse_string {
+    my ($class, $string) = @_;
+
+    return $string;
+}
 
 has bind => (
     is            => 'ro',
@@ -35,14 +49,13 @@ has _context => (
 has template => (
     is            => 'ro',
     isa           => 'Str',
-    default       => sub { +[] },
     documentation => 'Things to bind',
 );
 
 has say => (
     is            => 'ro',
     isa           => 'Any',
-    default       => sub { say @_ },
+    default       => sub { sub { say @_ } },
     documentation => 'Your callback for say, instead of ours',
 );
 
@@ -54,9 +67,7 @@ sub BUILD {
 
     # Standard library
     $context->bind_function(
-        say => sub {
-            say @_;
-        }
+        say => sub { say @_ },
     );
 
     $context->bind_function(
@@ -92,10 +103,10 @@ sub run {
         }
     }
 
-    say "code:[$code]";
+    # say "code:[$code]";
 
     unless ( my $retval = $context->eval($code) ){
-        say "retval:[$retval] \$\@:[$@]";
+        # say "retval:[$retval] \$\@:[$@]";
     }
 }
 
