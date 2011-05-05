@@ -149,18 +149,22 @@ sub run {
             }
             push (@parts, ['str', $line]) if ($line ne '');
 
+            if (@parts == 1) {
+                $js_code .= qq[;say('$line');];
+            } else {
             # join them up
-            $js_code .= join '', map {
-                my ($what, $value) = @$_;
-                my $ret;
-                if ($what eq 'str') {
-                    $ret = qq[;whisper('$value');];
-                } elsif ($what eq 'expr') {
-                    $ret = ";whisper($value);";
-                } else { die }
-            } @parts;
-
-            $js_code .= qq[;say('$line');];
+                $js_code .= join '', map {
+                    my ($what, $value) = @$_;
+                    my $ret;
+                    if ($what eq 'str') {
+                        $ret = qq[;whisper('$value');];
+                    } elsif ($what eq 'expr') {
+                        $ret = ";whisper($value);";
+                    } else {
+                        die;
+                    }
+                } @parts;
+            }
         } else {
             substr($line, 0, 1, '');
 
