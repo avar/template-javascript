@@ -14,9 +14,30 @@ use Template;
 
 Template::JavaScript - A templating engine using the L<JavaScript::V8> module
 
-=cut
+=head1 SYNOPSIS
 
-=head1 ATTRIBUTES
+    use Test::More qw( no_plan );
+    use Template::JavaScript;
+
+    my $tj = Template::JavaScript->new();
+
+    $tj->output( \my $out );
+
+    $tj->tmpl_string( <<'' );
+    before
+    % for( var i = 3; i ; i-- ){
+      this is a loop
+    % }
+    after
+
+    $tj->run;
+
+    is( $out, <<'', 'can run simple JS code (loops)' );
+    before
+      this is a loop
+      this is a loop
+      this is a loop
+    after
 
 =cut
 
