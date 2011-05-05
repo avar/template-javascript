@@ -164,7 +164,10 @@ sub tmpl_fh {
         $code = < $fh >;
     }
 
-    $self->template( $code );
+    my $output;
+    $self->_tt->process(\$code, {}, \$output) || die $self->_tt->error;
+
+    $self->template( $output );
 }
 
 sub tmpl_file {
