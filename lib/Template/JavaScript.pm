@@ -75,7 +75,7 @@ sub run {
     for my $line (split /\n/, $self->template) {
         chomp $line;
         if ( substr($line, 0, 1) ne '%' ) {
-            $code .= q[;say('] . $line . q[');];
+            $code .= qq[;say('$line');];
         } else {
             substr($line, 0, 1, '');
 
