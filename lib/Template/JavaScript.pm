@@ -58,7 +58,7 @@ has say => (
 
 has output => (
     is            => 'rw',
-    isa           => 'ScalarRef',
+    isa           => 'Any',
 );
 
 sub BUILD {
@@ -97,6 +97,18 @@ sub tmpl_string {
     $self->template( $string );
 }
 
+sub tmpl_fh {
+    my ($self, $fh) = @_;
+
+    my $code;
+    {
+        local $/;
+        $code = < $fh >;
+    }
+
+    $self->template( $code );
+}
+
 sub run {
     my ($self) = @_;
     my $context = $self->_context;
@@ -118,7 +130,14 @@ sub run {
         die "retval:[$retval] \$\@:[$@]";
     }
 
-    ${ $self->{output} } = $self->{_result};
+    given ( ref $self->{output} ) {
+        when ( 'SCALAR' ){
+            ${ $self->{output} } = $self->{_result};
+        }
+        when ( 'GLOB' ){
+            print { $self->{output} } $self->{_result};
+        }
+    }
 }
 
 1;

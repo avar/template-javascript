@@ -5,21 +5,20 @@ use warnings;
 
 # for the time being
 use Test::More qw( no_plan );
+use Test::Output;
 
 use Template::JavaScript;
 
 my $ctx = Template::JavaScript->new();
 
-my $three_loops = <<'';
+$ctx->output( \my $out );
+
+$ctx->tmpl_string( <<'' );
 before
 % for( var i = 3; i ; i-- ){
   this is a loop
 % }
 after
-
-$ctx->output( \my $out );
-
-$ctx->tmpl_string( $three_loops );
 
 $ctx->run;
 
@@ -29,5 +28,22 @@ before
   this is a loop
   this is a loop
 after
+
+undef $ctx;  # safety net
+
+my $ctx2 = Template::JavaScript->new();
+
+$ctx2->output( \*STDERR );
+
+$ctx2->tmpl_string( <<'' );
+I am a lumberjack and I am OK
+
+stderr_is(
+  sub { $ctx2->run },
+  "I am a lumberjack and I am OK\n",
+  'can write to STDERR FH'
+);
+
+undef $ctx2;  # safety net
 
 # :)
