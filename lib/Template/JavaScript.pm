@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 package Template::JavaScript;
-use v5.010.1;
-use strict;
-use warnings;
+use v5.10.0;
+
+use Any::Moose;
 use JavaScript::V8;
 
 =head1 NAME
@@ -11,31 +11,68 @@ Template::JavaScript - A templating engine using the L<JavaScript::V8> module
 
 =cut
 
+=head1 ATTRIBUTES
+
+=cut
+
+has bind => (
+    is            => 'ro',
+    isa           => 'ArrayRef[Any]',
+    default       => sub { +[] },
+    documentation => 'Things to bind',
+);
+
+has _context => (
+    is            => 'ro',
+    isa           => 'JavaScript::V8::Context',
+    lazy_build    => 1,
+    builder       => sub {
+        JavaScript::V8::Context->new;
+    },
+    documentation => '',
+);
+
+has template => (
+    is            => 'ro',
+    isa           => 'Str',
+    default       => sub { +[] },
+    documentation => 'Things to bind',
+);
+
+sub BUILD {
+    my ($self) = @_;
+    my $context = $self->_context;
+
+    # Standard library
+    $context->bind_function(
+        say => sub {
+            say @_;
+        }
+    );
+
+    $context->bind_function(
+        include => sub {
+            say "# including <$_[0]>...";
+        }
+    );
+
+    # User-supplied stuff
+    my $bind = $self->bind;
+
+    for my $b (@$bind) {
+        $context->bind(@$b);
+    }
+
+    return;
+}
+
 sub run {
-
-    my $context = JavaScript::V8::Context->new;
-
-    $context->bind_function( say => sub {
-                                 say @_;
-                             } );
-
-    $context->bind_function( include => sub {
-                                 say "# including <$_[0]>...";
-                             } );
-
-    $context->bind( b => {
-        site_name => 'boob',
-    } );
-
-    $context->bind( iloveyou => {
-        banana => 1,
-        rama => 2,
-        cazzi_mazzi => 0,
-    } );
+    my ($self) = @_;
+    my $context = $self->_context;
 
     my $code = '';
 
-    while (my $line = <DATA>) {
+    for my $line (split /\n/, $self->template) {
         chomp $line;
         if ( substr($line, 0, 1) ne '%' ) {
             $code .= q[;say('] . $line . q[');];
@@ -54,24 +91,3 @@ sub run {
 }
 
 1;
-
-__DATA__
-header
-
-% if( iloveyou.banana ){
-  <h1>banana active</h1>
-% } else {
-  (no banana)
-% }
-
-%  include ('sumthin.jmpl');
-
-% if( typeof cazzi != 'undefined' && cazzi.mazzi );
-% else say('nothing here');
-
-% var foobar = function( me ){
-%    say ("I am foobar and <" + me + ">");
-% };
-% var baz = function ( sumthin ){ };
-
-<footeR>
