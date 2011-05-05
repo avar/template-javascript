@@ -152,7 +152,10 @@ sub BUILD {
 sub tmpl_string {
     my ($self, $string) = @_;
 
-    $self->template( $string );
+    my $output;
+    $self->_tt->process(\$string, {}, \$output) || die $self->_tt->error;
+
+    $self->template( $output );
 }
 
 sub tmpl_fh {
