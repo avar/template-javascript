@@ -33,14 +33,14 @@ undef $ctx;  # safety net
 
 my $ctx2 = Template::JavaScript->new();
 
-$ctx2->output( \*STDERR );
+$ctx2->output( \*STDOUT );
 
 $ctx2->tmpl_string( <<'' );
 % if ( true ) {
 I am a lumberjack and I am OK
 % }
 
-stderr_is(
+stdout_is(
   sub { $ctx2->run },
   "I am a lumberjack and I am OK\n",
   'can write to STDERR FH'
@@ -48,4 +48,5 @@ stderr_is(
 
 undef $ctx2;  # safety net
 
+1;
 # :)
