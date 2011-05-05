@@ -1,16 +1,13 @@
 package Template::JavaScript;
 # vim: ft=perl ts=4 sw=4 et:
 
-use strict;
-use warnings;
-
 use v5.010.1;
 use Any::Moose;
 
+# For compiling our output
 use JavaScript::V8;
 
-use File::Spec::Functions qw(catdir catfile);
-use File::Slurp qw(slurp);
+# For generating our output
 use Template;
 
 =head1 NAME
