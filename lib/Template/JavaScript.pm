@@ -27,6 +27,23 @@ has bind => (
     documentation => 'Things to bind',
 );
 
+has template => (
+    is            => 'rw',
+    isa           => 'Str',
+    documentation => 'Things to bind',
+);
+
+has include_path => (
+    is            => 'rw',
+    isa           => 'Str|ArrayRef',
+    documentation => 'The include path for the templates',
+);
+
+has output => (
+    is            => 'rw',
+    isa           => 'Any',
+);
+
 has _context => (
     is            => 'ro',
     isa           => 'JavaScript::V8::Context',
@@ -44,23 +61,11 @@ has _result => (
     documentation => 'Result accumulator',
 );
 
-has template => (
-    is            => 'rw',
-    isa           => 'Str',
-    documentation => 'Things to bind',
-);
-
 has _tt => (
     is            => 'rw',
     isa           => 'Template',
     lazy_build    => 1,
     documentation => 'Our Template Toolkit object',
-);
-
-has include_path => (
-    is            => 'rw',
-    isa           => 'Str|ArrayRef',
-    documentation => 'The include path for the templates',
 );
 
 sub _build__tt {
@@ -76,11 +81,6 @@ sub _build__tt {
 
     return $tt;
 }
-
-has output => (
-    is            => 'rw',
-    isa           => 'Any',
-);
 
 sub BUILD {
     my ($self) = @_;
