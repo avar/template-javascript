@@ -37,6 +37,12 @@ has _context => (
     documentation => '',
 );
 
+has _js_code => (
+    is            => 'rw',
+    isa           => 'Str',
+    documentation => 'Compiled JS code',
+);
+
 has _result => (
     is            => 'rw',
     isa           => 'Str',
@@ -132,7 +138,7 @@ sub tmpl_file {
     $self->template( $output );
 }
 
-sub run {
+sub compile {
     my ($self) = @_;
     my $context = $self->_context;
 
@@ -179,8 +185,23 @@ sub run {
 
     # say STDERR "CODE:{$js_code}";
 
+    $self->_js_code( $js_code );
+}
+
+sub run {
+    my ($self) = @_;
+
+    my $js_code = '';
+    unless ( $js_code = $self->_js_code ){
+        $self->compile;
+        $js_code = $self->_js_code;
+    }
+
+    my $context = $self->_context;
+
     unless ( my $retval = $context->eval($js_code) ){
         $retval //= '<undef>';
+        $@ //= '<unknown error>';
         die "retval:[$retval] \$\@:[$@]";
     }
 
