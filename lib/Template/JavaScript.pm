@@ -5,6 +5,12 @@ use strict;
 use warnings;
 use JavaScript::V8;
 
+=head1 NAME
+
+Template::JavaScript - A templating engine using the L<JavaScript::V8> module
+
+=cut
+
 my $context = JavaScript::V8::Context->new;
 
 $context->bind_function( say => sub {
