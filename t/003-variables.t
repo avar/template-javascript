@@ -1,9 +1,24 @@
-use v5.10.0;
-use Any::Moose;
-use Template::JavaScript;
-use Test::More qw(no_plan);
+use strict;
+use warnings;
 
-my $template = <<"TEMPLATE";
+# for the time being
+use Test::More qw( no_plan );
+
+use Template::JavaScript;
+
+my $ctx = Template::JavaScript->new(
+    bind => [
+        [
+            iloveyou => {
+                banana => 1,
+                rama => 2,
+                cazzi_mazzi => 0,
+            }
+        ],
+    ],
+);
+
+my $three_loops = <<'TEMPLATE';
 header
 
 % if( iloveyou.banana ){
@@ -11,8 +26,6 @@ header
 % } else {
   (no banana)
 % }
-
-%  include ('sumthin.jmpl');
 
 % if( typeof cazzi != 'undefined' && cazzi.mazzi );
 % else say('nothing here');
@@ -25,26 +38,23 @@ header
 <footeR>
 TEMPLATE
 
-$main::output = '';
-my $t = Template::JavaScript->new(
-    bind => [
-        [
-            iloveyou => {
-                banana => 1,
-                rama => 2,
-                cazzi_mazzi => 0,
-            }
-        ],
-    ],
-    template => $template,
-    say => sub {
-        use Data::Dumper;
-        print Dumper \@_;
-        $main::output .= $_[0];
-        say @_;
-    },
-);
-# print "output: $main::output";
+$ctx->output( \my $out );
 
-$t->run;
+$ctx->tmpl_string( $three_loops );
+
+$ctx->run;
+
+is( $out, <<'OUTPUT', 'can do variable includes' );
+header
+
+  <h1>banana active</h1>
+
+
+
+<footeR>
+OUTPUT
+
+
+# :)
+
 
