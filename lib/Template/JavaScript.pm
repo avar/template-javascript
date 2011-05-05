@@ -101,7 +101,7 @@ sub BUILD {
     # Standard library
     $context->bind_function( say => $self->say );
 
-    $context->bind_function( o => sub {
+    $context->bind_function( javascript_output => sub {
         $self->{_result} .= $_[0];
         $self->{_result} .= "\n";
     });
@@ -146,7 +146,7 @@ sub tmpl_file {
     my $output;
     $self->_tt->process($file, {}, \$output) || die $self->_tt->error;
 
-    $self->template( $file );
+    $self->template( $output );
 }
 
 sub run {
@@ -158,11 +158,11 @@ sub run {
     for my $line (split /\n/, $self->template) {
         chomp $line;
         if ( substr($line, 0, 1) ne '%' ) {
-            $js_code .= qq[;o('$line');];
+            $js_code .= qq[;javascript_output('$line');\n];
         } else {
             substr($line, 0, 1, '');
 
-            $js_code .= $line;
+            $js_code .= $line . "\n";
         }
     }
 

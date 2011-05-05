@@ -19,3 +19,14 @@ $ctx->output( \my $out );
 $ctx->tmpl_file( $root );
 $ctx->run;
 
+is( $out, <<'OUTPUT', 'can do variable includes' );
+I am a header
+
+I am a footer
+
+
+hello there
+
+Whats up?
+OUTPUT
+
