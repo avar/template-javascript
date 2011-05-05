@@ -166,7 +166,11 @@ sub run {
         }
     }
 
+    # for debugging
+    # say STDERR "CODE:{$js_code}";
+
     unless ( my $retval = $context->eval($js_code) ){
+        $retval //= '<undef>';
         die "retval:[$retval] \$\@:[$@]";
     }
 
