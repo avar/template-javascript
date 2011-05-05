@@ -148,8 +148,12 @@ sub run {
                 $line = $3;
             }
             push (@parts, ['str', $line]) if ($line ne '');
+            # use Data::Dumper;
+            # say STDERR "begin";
+            # say STDERR Dumper \@parts;
+            # say STDERR "end";
 
-            if (@parts == 1) {
+            if (@parts == 0 || @parts == 1) {
                 $js_code .= qq[;say('$line');];
             } else {
             # join them up
