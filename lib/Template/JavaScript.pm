@@ -9,7 +9,6 @@ use Any::Moose;
 
 use JavaScript::V8;
 
-
 =head1 NAME
 
 Template::JavaScript - A templating engine using the L<JavaScript::V8> module
@@ -19,16 +18,6 @@ Template::JavaScript - A templating engine using the L<JavaScript::V8> module
 =head1 ATTRIBUTES
 
 =cut
-
-sub output_ref {
-    my ($self) = @_;
-}
-
-sub parse_string {
-    my ($class, $string) = @_;
-
-    return $string;
-}
 
 has bind => (
     is            => 'ro',
@@ -47,8 +36,15 @@ has _context => (
     documentation => '',
 );
 
+has _result => (
+    is            => 'rw',
+    isa           => 'Str',
+    default       => '',
+    documentation => 'Result accumulator',
+);
+
 has template => (
-    is            => 'ro',
+    is            => 'rw',
     isa           => 'Str',
     documentation => 'Things to bind',
 );
@@ -60,6 +56,11 @@ has say => (
     documentation => 'Your callback for say, instead of ours',
 );
 
+has output => (
+    is            => 'rw',
+    isa           => 'ScalarRef',
+);
+
 sub BUILD {
     my ($self) = @_;
     my $context = $self->_context;
@@ -68,6 +69,11 @@ sub BUILD {
 
     # Standard library
     $context->bind_function( say => $self->say );
+
+    $context->bind_function( o => sub {
+        $self->{_result} .= $_[0];
+        $self->{_result} .= "\n";
+    });
 
     $context->bind_function(
         include => sub {
@@ -85,28 +91,34 @@ sub BUILD {
     return;
 }
 
+sub tmpl_string {
+    my ($self, $string) = @_;
+
+    $self->template( $string );
+}
+
 sub run {
     my ($self) = @_;
     my $context = $self->_context;
 
-    my $code = '';
+    my $js_code = '';
 
     for my $line (split /\n/, $self->template) {
         chomp $line;
         if ( substr($line, 0, 1) ne '%' ) {
-            $code .= qq[;say('$line');];
+            $js_code .= qq[;o('$line');];
         } else {
             substr($line, 0, 1, '');
 
-            $code .= $line;
+            $js_code .= $line;
         }
     }
 
- #   say "code:[$code]";
-
-    unless ( my $retval = $context->eval($code) ){
-#        say "retval:[$retval] \$\@:[$@]";
+    unless ( my $retval = $context->eval($js_code) ){
+        die "retval:[$retval] \$\@:[$@]";
     }
+
+    ${ $self->{output} } = $self->{_result};
 }
 
 1;

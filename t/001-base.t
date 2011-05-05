@@ -3,7 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+# use Test::More tests => 6;
+use Test::More qw( no_plan );
 
 my $p = 'Template::JavaScript';
 
@@ -15,10 +16,17 @@ my $ctx = Template::JavaScript->new();
 
 isa_ok($ctx, $p);
 
-can_ok($ctx, 'output_ref');
-can_ok($ctx, 'parse_string');
-
 my $simple = <<'';
 foobar
+baz
 
-is($ctx->parse_string($simple), "foobar\n", 'can parse simple string');
+can_ok($p, 'tmpl_string');
+$ctx->tmpl_string( $simple );
+
+can_ok($p, 'output');
+$ctx->output( \my $out );
+
+can_ok($p, 'run');
+$ctx->run;
+
+is( $out, "foobar\nbaz\n", 'can parse simple string' );

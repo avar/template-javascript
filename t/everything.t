@@ -44,7 +44,7 @@ my $t = Template::JavaScript->new(
         say @_;
     },
 );
-print "output: $output";
+# print "output: $main::output";
 
 $t->run;
 
