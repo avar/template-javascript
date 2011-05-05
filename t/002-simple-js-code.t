@@ -36,7 +36,9 @@ my $ctx2 = Template::JavaScript->new();
 $ctx2->output( \*STDERR );
 
 $ctx2->tmpl_string( <<'' );
+% if ( true ) {
 I am a lumberjack and I am OK
+% }
 
 stderr_is(
   sub { $ctx2->run },
