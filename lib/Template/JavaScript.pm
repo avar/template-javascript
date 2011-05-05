@@ -91,6 +91,9 @@ sub BUILD {
         $self->{_result} .= $_[0];
         $self->{_result} .= "\n";
     });
+    $context->bind_function( whisper => sub {
+        $self->{_result} .= $_[0];
+    });
 
     # User-supplied stuff
     my $bind = $self->bind;
@@ -138,7 +141,26 @@ sub run {
     for my $line (split /\n/, $self->template) {
         chomp $line;
         if ( substr($line, 0, 1) ne '%' ) {
-            $js_code .= qq[;say('$line');\n];
+            my @parts;
+            # Parse inline variables
+            while($line =~ /(.*?)<%\s*([^%]*?)\s*%>(.*)/s) {
+                push (@parts, ( [ 'str', $1 ], [ 'expr', $2 ] ));
+                $line = $3;
+            }
+            push (@parts, ['str', $line]) if ($line ne '');
+
+            # join them up
+            $js_code .= join '', map {
+                my ($what, $value) = @$_;
+                my $ret;
+                if ($what eq 'str') {
+                    $ret = qq[;whisper('$value');];
+                } elsif ($what eq 'expr') {
+                    $ret = ";whisper($value);";
+                } else { die }
+            } @parts;
+
+            $js_code .= qq[;say('$line');];
         } else {
             substr($line, 0, 1, '');
 
@@ -147,7 +169,7 @@ sub run {
     }
 
     # for debugging
-    # say STDERR "CODE:{$js_code}";
+    say STDERR "CODE:{$js_code}";
 
     unless ( my $retval = $context->eval($js_code) ){
         $retval //= '<undef>';
