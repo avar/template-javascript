@@ -10,6 +10,9 @@ use JavaScript::V8;
 # For generating our output
 use Template;
 
+# Utility functions
+use JavaScript::Value::Escape;
+
 =head1 NAME
 
 Template::JavaScript - A templating engine using the L<JavaScript::V8> module
@@ -204,14 +207,16 @@ sub compile {
             # say STDERR "end";
 
             if (@parts == 0 || @parts == 1) {
-                $js_code .= qq[;say('$line');];
+                my $escaped = javascript_value_escape($line);
+                $js_code .= qq[;say('$escaped');];
             } else {
             # join them up
                 $js_code .= join '', map {
                     my ($what, $value) = @$_;
                     my $ret;
                     if ($what eq 'str') {
-                        $ret = qq[;whisper('$value');];
+                        my $escaped = javascript_value_escape($value);
+                        $ret = qq[;whisper('$escaped');];
                     } elsif ($what eq 'expr') {
                         $ret = ";whisper($value);";
                     } else {

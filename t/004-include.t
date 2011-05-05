@@ -27,6 +27,6 @@ I am a footer
 
 hello there
 
-Whats up?
+What's up?
 OUTPUT
 
