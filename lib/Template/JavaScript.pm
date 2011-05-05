@@ -139,7 +139,6 @@ sub run {
     my $js_code = '';
 
     for my $line (split /\n/, $self->template) {
-        chomp $line;
         if ( substr($line, 0, 1) ne '%' ) {
             my @parts;
             # Parse inline variables
