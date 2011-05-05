@@ -48,11 +48,12 @@ has _context => (
     is            => 'ro',
     isa           => 'JavaScript::V8::Context',
     lazy_build    => 1,
-    builder       => sub {
-        JavaScript::V8::Context->new;
-    },
     documentation => '',
 );
+
+sub _build__context {
+    JavaScript::V8::Context->new;
+}
 
 has _result => (
     is            => 'rw',
